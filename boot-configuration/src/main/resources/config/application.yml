@@ -1,0 +1,7 @@
+##指定需要使用的文件
+#spring:
+#  profiles:
+#    active: test
+
+#server:
+#  port: 7777

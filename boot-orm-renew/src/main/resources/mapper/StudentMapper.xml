@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ej.boot.orm.mapper.StudentMapper">
+
+    <resultMap id="studentMap" type="com.ej.boot.orm.domain.Student">
+        <id property="studentId" column="student_id" jdbcType="INTEGER"/>
+        <result property="clazzId" column="clazz_id" jdbcType="INTEGER"/>
+        <result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+        <result property="hometown" column="hometown" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="DATE"/>
+        <association property="clazz" javaType="Clazz">
+            <id column="clazz_id" property="clazzId"/>
+            <result column="clazz_name" property="clazzName"/>
+        </association>
+
+        <collection property="courses" ofType="Course">
+            <id column="course_id" property="courseId"/>
+            <result column="course_name" property="courseName"/>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        student_id
+        ,clazz_id,student_name,
+        hometown,birthday
+    </sql>
+    <insert id="insert">
+        INSERT INTO t_student (clazz_id, student_name, hometown, birthday)
+        VALUES (#{clazzId}, #{studentName}, #{hometown}, #{birthday})
+    </insert>
+    <insert id="batchInsert" parameterType="com.ej.boot.orm.domain.Student">
+        INSERT INTO t_student
+        (clazz_id, student_name, hometown, birthday)
+        VALUES
+        <foreach collection="students" item="student" index="index" separator=",">
+            (#{student.clazzId}, #{student.studentName}, #{student.hometown}, #{student.birthday})
+        </foreach>
+    </insert>
+    <update id="batchUpdate" parameterType="java.util.List">
+        <foreach collection="students" index="index" item="student" open="" close="" separator=";">
+            UPDATE t_student t
+            <set>
+                t.student_name = #{student.studentName}
+            </set>
+            WHERE t.student_id = ${student.studentId}
+        </foreach>
+    </update>
+    <delete id="batchDelete" parameterType="java.lang.Integer">
+        DELETE FROM t_student
+        WHERE student_id IN
+        <foreach collection="ids" item="id" index="index" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+
+    </delete>
+    <select id="findStudentBy" resultType="com.ej.boot.orm.domain.Student"
+            parameterType="com.ej.boot.orm.domain.Student">
+        SELECT *
+        FROM t_student
+        <where>
+            <if test="student.studentId != null">
+                student_id = #{student.studentId}
+            </if>
+            <if test="student.studentName != null">
+                and student_name = #{student.studentName}
+            </if>
+            <if test="student.hometown != null">
+                AND hometown LIKE concat('%',#{student.hometown},'%')
+            </if>
+
+        </where>
+    </select>
+    <select id="findManyByOne" resultMap="studentMap">
+        SELECT s.student_id,
+               s.student_name,
+               s.hometown,
+               s.birthday,
+               c.clazz_id,
+               c.clazz_name
+        FROM t_student s,
+             t_clazz c
+        WHERE s.student_id = #{studentId}
+          AND s.clazz_id = c.clazz_id
+    </select>
+    <select id="getStudent" resultMap="studentMap">
+        SELECT s.student_id,
+               s.student_name,
+               s.hometown,
+               s.birthday,
+               c.clazz_id,
+               c.clazz_name,
+               cc.course_id,
+               cc.course_name
+        FROM t_student s
+                 LEFT JOIN t_clazz c
+                           ON s.clazz_id = c.clazz_id
+                 LEFT JOIN t_course_student ts
+                           ON s.student_id = ts.student_id
+                 LEFT JOIN t_course cc
+                           ON ts.course_id = cc.course_id
+        WHERE s.student_id = #{studentId}
+    </select>
+
+</mapper>

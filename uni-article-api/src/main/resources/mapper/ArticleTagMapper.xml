@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ej.article.mapper.ArticleTagMapper">
+
+    <insert id="batchInsert" parameterType="com.ej.article.model.entity.ArticleTag">
+        INSERT INTO t_article_tag(article_id,tag_id,tag_name) VALUES
+        <foreach collection="articleTagList" item="item" index="index" separator=",">
+            (#{item.articleId},#{item.tagId},#{item.tagName})
+        </foreach>
+    </insert>
+
+</mapper>

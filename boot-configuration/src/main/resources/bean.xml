@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!--id就是你在new一个对象的时候，对象的名字  class就是你的全名，从包写全了 ，下面一行代码就等同于
+    TestBeanService TestBeanService = new TestBeanService-->
+    <bean id="testBeanService" class="com.ej.boot.service.TestBeanService">
+<!--        属性注入-->
+<!--        <property name="name" value="SpringBoot"/>-->
+<!--        构造器注入-->
+<!--        需要用的set方法，使用set传值-->
+        <constructor-arg name="name" value="SpringBoot"></constructor-arg>
+    </bean>
+</beans>
